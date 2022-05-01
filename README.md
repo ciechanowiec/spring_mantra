@@ -70,11 +70,11 @@ The script is executed according to the following algorithm:
 The above file structure implements the default file structure used by Spring Boot when initializing projects at https://start.spring.io/ (captured on May 2022)<br/>
 5\. Add default Spring Boot content to `Main.java` <br/>
 6\. Add default Spring Boot content to `DefaultController.java` <br/>
-7\. Add default application properties to `application.properties` (logging to a file)<br/>
+7\. Add default application properties to `application.properties`<br/>
 8\. Add default logger properties to `tinylog.properties` (logging to a file)<br/>
 9\. Add default test content to `MainTest.java` (testing whether the context was loaded)<br/>
 10\. Add default Maven-content to `pom.xml`<br/>
-11\. Add default content do `README.md` (the project name and date of creation)<br/>
+11\. Add default content to `README.md` (the project name and date of creation)<br/>
 12\. Add `.gitignore` file which sets git to ignore:<br/>
 12.1. all files with `.class` extension<br/>
 12.2. all files with `.log` extension + file named `logs.txt`<br/>
