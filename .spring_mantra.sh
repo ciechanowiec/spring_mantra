@@ -282,10 +282,6 @@ cat > $pomFile << EOF
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-mongodb</artifactId>
-    </dependency>
 
     <!-- Logging -->	
     <dependency>
