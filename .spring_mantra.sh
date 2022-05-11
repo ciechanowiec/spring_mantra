@@ -237,8 +237,14 @@ cat > $pomFile << EOF
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
+    <!--  dependencies  -->
     <tinylog-api.version>2.5.0-M1.1</tinylog-api.version>
     <tinylog-impl.version>2.5.0-M1.1</tinylog-impl.version>
+    <!--  dependency management  -->
+    <spring-cloud-dependencies.version>2021.0.2</spring-cloud-dependencies.version>
+    <!--  build plugins  -->
+    <dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
+    <docker.image.prefix>$secondLevelPackageName</docker.image.prefix>
     <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
     <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
     <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
@@ -248,28 +254,40 @@ cat > $pomFile << EOF
     <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
   </properties>
 
-  <dependencies>  
-    <!-- Spring Boot dependencies -->
+  <dependencies>
+    <!-- spring dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <optional>true</optional>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-config-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-hateoas</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
 
-    <!-- Data persistence -->
+    <!-- data persistence -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -278,12 +296,8 @@ cat > $pomFile << EOF
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
     </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-    </dependency>
 
-    <!-- Logging -->	
+    <!-- logging -->
     <dependency>
       <groupId>org.tinylog</groupId>
       <artifactId>tinylog-api</artifactId>
@@ -296,7 +310,20 @@ cat > $pomFile << EOF
     </dependency>
   </dependencies>
 
-  <build>    
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>\${spring-cloud-dependencies.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <!--  spring  -->
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -309,7 +336,33 @@ cat > $pomFile << EOF
             </exclude>
           </excludes>
         </configuration>
-      </plugin>    
+      </plugin>
+      <plugin>
+        <!-- this plugin is used to create a docker image
+             and publish the image to docker hub-->
+        <groupId>com.spotify</groupId>
+        <artifactId>dockerfile-maven-plugin</artifactId>
+        <version>\${dockerfile-maven-plugin.version}</version>
+        <configuration>
+          <repository>\${docker.image.prefix}/\${project.artifactId}</repository>
+          <tag>\${project.version}</tag>
+          <buildArgs>
+            <JAR_FILE>target/\${project.build.finalName}.jar</JAR_FILE>
+          </buildArgs>
+        </configuration>
+        <executions>
+          <execution>
+            <id>default</id>
+            <phase>install</phase>
+            <goals>
+              <goal>build</goal>
+              <goal>push</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--  others  -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
