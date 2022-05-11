@@ -96,6 +96,7 @@ projectName=$4
 	touch $1/src/test/java/$firstLevelPackageName/$secondLevelPackageName/$projectName/MainTest.java
 	touch $1/pom.xml
 	touch $1/README.md
+	touch $1/Dockerfile
 	printf "\e[1;96m[STATUS]:\e[0m The following file structure for the project has been created:\n"
 	tree $1
 }
@@ -125,9 +126,9 @@ class Main {
         Logger.info("Application started.");
         SpringApplication.run(Main.class, args);
     }
-}		
+}
 EOF
-printf "\e[1;96m[STATUS]:\e[0m Default Spring Boot content has been added to \e[3mMain.java\e[0m.\n" 
+printf "\e[1;96m[STATUS]:\e[0m Default Spring Boot content has been added to \e[3mMain.java\e[0m.\n"
 }
 
 insertContentToDefaultController () {
@@ -158,7 +159,7 @@ class DefaultController {
     }
 }
 EOF
-printf "\e[1;96m[STATUS]:\e[0m Default Spring Boot content has been added to \e[3mDefaultController.java\e[0m.\n" 
+printf "\e[1;96m[STATUS]:\e[0m Default Spring Boot content has been added to \e[3mDefaultController.java\e[0m.\n"
 }
 
 insertContentToApplicationProperties () {
@@ -198,7 +199,7 @@ class MainTest {
     @Test
     void contextLoads() {
     }
-    
+
 }
 EOF
 printf "\e[1;96m[STATUS]:\e[0m Default test content has been added to \e[3mMainTest.java\e[0m.\n"
@@ -217,7 +218,7 @@ cat > $pomFile << EOF
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
@@ -478,6 +479,63 @@ EOF
 printf "\e[1;96m[STATUS]:\e[0m Default readme-content has been added to \e[3mREADME.md\e[0m.\n"
 }
 
+insertContentToDockerfile () {
+projectDirectory=$1
+firstLevelPackageName=$2
+secondLevelPackageName=$3
+projectName=$4
+gitCommitterName=$5
+gitCommitterSurname=$6
+gitCommitterEmail=$7
+dockerFile=$projectDirectory/Dockerfile
+date=`date +%F`
+cat > $dockerFile << EOF
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
+#             STAGE 1             #
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
+
+# Specify the Docker image to use in the Docker runtime:
+FROM openjdk:17-oracle as build
+
+LABEL maintainer="$gitCommitterName $gitCommitterSurname <$gitCommitterEmail>"
+
+# Define the JAR_FILE variable set by dockerfile-maven-plugin:
+ARG JAR_FILE
+
+# Add the application's jar to the container.
+# This will copy the JAR file to the filestystem
+# of the image named app.jar:
+COPY \${JAR_FILE} app.jar
+
+# Unpack the app.jar copied previously into
+# the file system of the build image:
+RUN mkdir -p target/dependency && (cd target/dependency; jar -xf /app.jar)
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
+#             STAGE 2             #
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
+# ->>> the new image created in this stage contains the different
+#      layers of a Spring Boot app instead of the complere JAR file
+
+# Specify the Docker image to use in the Docker runtime:
+FROM openjdk:17-oracle
+
+# Add volume pointing to /tmp:
+VOLUME /tmp
+
+# Copy the different layers from the first image named 'build':
+ARG DEPENDENCY=/target/dependency
+COPY --from=build \${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY --from=build \${DEPENDENCY}/META-INF /app/META-INF
+COPY --from=build \${DEPENDENCY}/BOOT-INF/classes /app
+
+# Target this service application in the image
+# when the container is created:
+ENTRYPOINT ["java","-cp","app:app/lib/*","$firstLevelPackageName.$secondLevelPackageName.$projectName.Main"]
+EOF
+printf "\e[1;96m[STATUS]:\e[0m Default Docker-content has been added to \e[3mDockerfile\e[0m.\n"
+}
+
 addGitignore () {
 projectDirectory=$1
 touch $projectDirectory/.gitignore
@@ -493,7 +551,7 @@ logs.txt
 # 'target' directory located directly in the project directory:
 /target
 
-# All files and directories which names start with . (dot), 
+# All files and directories which names start with . (dot),
 # except .git, .gitattributes and .gitignore:
 .*
 !/.git
@@ -634,6 +692,7 @@ insertContentToLoggerProperties $projectDirectory
 insertContentToMainTest $projectDirectory $firstLevelPackageName $secondLevelPackageName $projectName
 insertContentToPom $projectDirectory $firstLevelPackageName $secondLevelPackageName $projectName $projectURL
 insertContentToReadme $projectDirectory $projectName
+insertContentToDockerfile $projectDirectory $firstLevelPackageName $secondLevelPackageName $projectName $gitCommitterName $gitCommitterSurname $gitCommitterEmail
 addGitignore $projectDirectory
 addGitAttributes $projectDirectory
 initGit $projectDirectory
