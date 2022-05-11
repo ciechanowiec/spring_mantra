@@ -532,6 +532,21 @@ COPY --from=build \${DEPENDENCY}/BOOT-INF/classes /app
 # Target this service application in the image
 # when the container is created:
 ENTRYPOINT ["java","-cp","app:app/lib/*","$firstLevelPackageName.$secondLevelPackageName.$projectName.Main"]
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
+#              HINTS              #
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
+# To build a Docker image from your project:
+#   -> mvn package dockerfile:build
+# To check that the Docker image was build and added to the repository:
+#   -> docker images
+# To run the Docker image in the background:
+#   -> docker run -d $secondLevelPackageName/$projectName:1.0
+#      * docker run -d [docker_repository_name]:[docker_repository_tag]
+# List Docker containers:
+#   -> docker ps
+# Stop the Docker container:
+#   -> docker stop [container_id]
 EOF
 printf "\e[1;96m[STATUS]:\e[0m Default Docker-content has been added to \e[3mDockerfile\e[0m.\n"
 }
