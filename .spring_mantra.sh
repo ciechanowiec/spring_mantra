@@ -166,7 +166,7 @@ insertContentToApplicationProperties () {
 applicationPropertiesFile=$1/src/main/resources/application.properties
 # Intentional injecting of two empty lines
 cat > $applicationPropertiesFile << EOF
-
+spring.cloud.config.enabled=false
 EOF
 printf "\e[1;96m[STATUS]:\e[0m Default application properties have been added to \e[3mapplication.properties\e[0m.\n"
 }
