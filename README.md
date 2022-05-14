@@ -75,11 +75,7 @@ The above file structure implements the default file structure used by Spring Bo
 9\. Add default test content to `MainTest.java` (testing whether the context was loaded)<br/>
 10\. Add default Maven-content to `pom.xml`<br/>
 11\. Add default content to `README.md` (the project name and date of creation)<br/>
-12\. Add `.gitignore` file which sets git to ignore:<br/>
-12.1. all files with `.class` extension<br/>
-12.2. all files with `.log` extension + file named `logs.txt`<br/>
-12.4. `target` directory located directly in the project directory<br/>
-12.5. all files and directories which names start with `.` (dot), except `.git`, `.gitattributes` and `.gitignore`<br/>
+12\. Add `.gitignore` file with standard content
 13\. Add `.gitattributes` file which normalizes line endings<br/>
 14\. Initialize git repository in the project directory<br/>
 15\. Set up git committer<br/>
