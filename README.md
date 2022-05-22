@@ -45,6 +45,7 @@ The script is executed according to the following algorithm:
 4\. In the project directory create the file structure according to the following template:<br/>
 ```
 /home/herman/colibriproject
+├── Dockerfile
 ├── pom.xml
 ├── README.md
 └── src
@@ -66,32 +67,22 @@ The script is executed according to the following algorithm:
                 └── ciechanowiec
                     └── colibriproject
                         └── MainTest.java
-
 ```     
 The above file structure implements the default file structure used by Spring Boot when initializing projects at https://start.spring.io/ (captured on May 2022)<br/>
-5\. Add default Spring Boot content to `Main.java` <br/>
-6\. Add default Spring Boot content to `DefaultController.java` <br/>
-7\. Add default application properties to `application.properties`<br/>
-8\. Add default logger properties to `tinylog.properties` (logging to a file)<br/>
-9\. Add default test content to `MainTest.java` (testing whether the context was loaded)<br/>
-10\. Add default Maven-content to `pom.xml`<br/>
-11\. Add default content to `README.md` (the project name and date of creation)<br/>
-12\. Add `.gitignore` file with standard content
-13\. Add `.gitattributes` file which normalizes line endings<br/>
-14\. Initialize git repository in the project directory<br/>
-15\. Set up git committer<br/>
-16\. Show finish message on successful project creation<br/>
-17\. Open the project directory in the new window with IntelliJ IDEA Community, IntelliJ IDEA Ultimate or Visual Studio Code if installed (this option works if it was turned on during configuration, by default it is turned off)
+5\. Add default content to project files
+6\. Initialize git repository in the project directory<br/>
+7\. Set up git committer<br/>
+8\. Open the project directory in the new window with IntelliJ IDEA Community, IntelliJ IDEA Ultimate or Visual Studio Code if installed (this option works if it was turned on during configuration, by default it is turned off)
 
 ## How to Use
 1. Make sure that prerequisites listed above are installed
 2. Put the script (file `.spring_mantra.sh`) to the home folder so that its path will be `~/.spring_mantra.sh`
-3. At the end of the script (file `.spring_mantra.sh`), after the comment-banner `DRIVER CODE`, there are 3 blocks of code encapsulated inside the pair-comments `>> START OF A CONFIGURABLE BLOCK` and `<< END OF A CONFIGURABLE BLOCK`. Configure the code in that blocks according to the clues contained in that blocks
-4. Give the script a permission to be run (`chmod 755 ~/.spring_mantra.sh`)
+3. At the end of the script (file `.spring_mantra.sh`), after the comment-banner `DRIVER CODE`, there are 3 blocks of code encapsulated inside the pair-comments `>> START OF A CONFIGURABLE BLOCK` and `<< END OF A CONFIGURABLE BLOCK`. Configure the code in those blocks according to the clues contained in those blocks
+4. Give the script permission to be run (`chmod 755 ~/.spring_mantra.sh`)
 5. Set up the following alias for the terminal (on Linux Ubuntu aliases are usually specified in the hidden file `~/.bashrc`):<br>
    `alias spring='~/.spring_mantra.sh'`
 6. Restart all instances of the terminal
-7. Now Spring Mantra can be run by invoking the `spring` command
+7. Now the script can be run by invoking the `spring` command
 
 ## Screenshots
 <kbd><img src="!presentation/1.png"></kbd><br/>
