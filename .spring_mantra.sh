@@ -123,7 +123,7 @@ import org.tinylog.Logger;
 class Main {
 
     public static void main(String[] args) {
-        Logger.info("Application started.");
+        Logger.info("Application started");
         SpringApplication.run(Main.class, args);
     }
 }
@@ -164,8 +164,9 @@ printf "\e[1;96m[STATUS]:\e[0m Default Spring Boot content has been added to \e[
 
 insertContentToApplicationProperties () {
 applicationPropertiesFile=$1/src/main/resources/application.properties
-# Intentional injecting of two empty lines
 cat > $applicationPropertiesFile << EOF
+# If there is a spring-cloud-starter-config dependency declared,
+# the Spring Cloud configuration should be provided or fully disabled:
 spring.cloud.config.enabled=false
 EOF
 printf "\e[1;96m[STATUS]:\e[0m Default application properties have been added to \e[3mapplication.properties\e[0m.\n"
@@ -174,7 +175,9 @@ printf "\e[1;96m[STATUS]:\e[0m Default application properties have been added to
 insertContentToLoggerProperties () {
 loggerPropertiesFile=$1/src/main/resources/tinylog.properties
 cat > $loggerPropertiesFile << EOF
-writer        = file
+writer        = console
+# to write to a file:
+# writer        = file
 writer.format = {date: yyyy-MM-dd HH:mm:ss.SSS O} {level}: {message}
 writer.file   = logs.txt
 EOF
@@ -222,7 +225,7 @@ cat > $pomFile << EOF
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.6.7</version>
+    <version>2.7.0</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
@@ -236,53 +239,61 @@ cat > $pomFile << EOF
   <url>$projectURL</url>
 
   <properties>
+    <!-- building properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
-    <!--  dependencies  -->
+    <!-- override the version from Spring Boot Parent Properties-->
+    <java.version>17</java.version>
+    <!-- dependencies -->
     <tinylog-api.version>2.5.0-M1.1</tinylog-api.version>
     <tinylog-impl.version>2.5.0-M1.1</tinylog-impl.version>
-    <!--  dependency management  -->
-    <spring-cloud-dependencies.version>2021.0.2</spring-cloud-dependencies.version>
-    <!--  build plugins  -->
+    <!-- dependency management -->
+    <!-- ATTENTION: the version of spring-cloud-dependencies should correspond to the
+                    appropriate version of Spring Boot application; see details at:
+                    https://spring.io/projects/spring-cloud -->
+    <spring-cloud.version>2021.0.3-SNAPSHOT</spring-cloud.version>
+    <!-- plugins -->
     <dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
     <docker.image.prefix>$secondLevelPackageName</docker.image.prefix>
-    <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-    <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
-    <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
-    <maven-dependency-plugin.version>3.3.0</maven-dependency-plugin.version>
-    <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-    <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
-    <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
   </properties>
 
   <dependencies>
-    <!-- spring dependencies -->
+    <!-- Spring dependencies -->
     <dependency>
+      <!-- allows to build web, including RESTful, applications using Spring MVC;
+           uses Apache Tomcat as the default embedded container -->
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
+      <!-- supports built in (or custom) endpoints that let to monitor and manage
+           the application - such as application health, metrics, sessions, etc. -->
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-config</artifactId>
-    </dependency>
-    <dependency>
+      <!-- eases the creation of RESTful APIs that follow the HATEOAS
+           principle when working with Spring / Spring MVC -->
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-hateoas</artifactId>
     </dependency>
     <dependency>
+      <!-- server-side Java template engine for both web and standalone environments;
+           allows HTML to be correctly displayed in browsers and as static prototypes -->
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
     </dependency>
     <dependency>
+      <!-- manages tests in Spring Boot application;
+           added by default by Spring Initializr -->
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
+      <!-- Java annotation library which helps
+           to reduce boilerplate code -->
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>
@@ -290,12 +301,25 @@ cat > $pomFile << EOF
 
     <!-- data persistence -->
     <dependency>
+      <!-- allows to persist data in SQL stores with Java
+           Persistence API using Spring Data and Hibernate.-->
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
     <dependency>
+      <!-- fast in-memory database that supports JDBC API and R2DBC access,
+           with a small (2mb) footprint; supports embedded and server
+           modes as well as a browser based console application -->
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
+    </dependency>
+
+    <!-- microservices -->
+    <dependency>
+      <!-- declares the app as a client that connects to a Spring
+           Cloud Config Server to fetch the application's configuration -->
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-config</artifactId>
     </dependency>
 
     <!-- logging -->
@@ -314,9 +338,13 @@ cat > $pomFile << EOF
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <!-- a Bill of Materials required by Spring Cloud; it is
+             added by default by Spring Initializr when adding
+             spring-cloud-starter-config dependency; details:
+             https://spring.io/projects/spring-cloud-->
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-dependencies</artifactId>
-        <version>\${spring-cloud-dependencies.version}</version>
+        <version>\${spring-cloud.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -324,14 +352,18 @@ cat > $pomFile << EOF
   </dependencyManagement>
 
   <build>
-    <!--  spring  -->
     <plugins>
+      <!-- spring -->
       <plugin>
+        <!-- allows to package executable jar or war archives, run Spring
+             Boot applications, generate build information and start Spring
+             Boot application prior to running integration tests -->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
           <excludes>
             <exclude>
+              <!-- this exclusion is added by default by Spring Initializr -->
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
             </exclude>
@@ -339,8 +371,8 @@ cat > $pomFile << EOF
         </configuration>
       </plugin>
       <plugin>
-        <!-- this plugin is used to create a docker image
-             and publish the image to docker hub-->
+        <!-- for creation of a Docker image
+             and publishing it to Docker Hub-->
         <groupId>com.spotify</groupId>
         <artifactId>dockerfile-maven-plugin</artifactId>
         <version>\${dockerfile-maven-plugin.version}</version>
@@ -362,83 +394,7 @@ cat > $pomFile << EOF
           </execution>
         </executions>
       </plugin>
-
-      <!--  others  -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>\${maven-compiler-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>\${maven-resources-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>/target/src/main/resources</outputDirectory>
-              <includeEmptyDirs>true</includeEmptyDirs>
-              <resources>
-                <resource>
-                  <directory>/src/main/resources</directory>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>\${maven-jar-plugin.version}</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-	          <classpathPrefix>lib/</classpathPrefix> <!-- enables usage of dependencies from .jar
-                                                           by copying them into the target folder -->
-              <mainClass>$firstLevelPackageName.$secondLevelPackageName.$projectName.Main</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <!-- enables usage of dependencies from .jar
-             by copying them into the target folder -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>\${maven-dependency-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>\${project.build.directory}/lib</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <!-- prevents from building if unit tests don't pass -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>\${maven-surefire-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <!-- prevents from building if integration tests don't pass -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>\${maven-failsafe-plugin.version}</version>
-      </plugin>
+      <!-- others -->
       <plugin>
         <!-- creates reports on tests coverage (target->site->jacoco->index.html) -->
         <groupId>org.jacoco</groupId>
@@ -543,6 +499,9 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","$firstLevelPackageName.$secondLevelPac
 # To run the Docker image in the background:
 #   -> docker run -d $secondLevelPackageName/$projectName:1.0
 #      * docker run -d [docker_repository_name]:[docker_repository_tag]
+# To run the Docker image on the specified localhost port:
+#   -> docker run -p "8080:8080" $secondLevelPackageName/$projectName:1.0
+#      * docker run -p "[TCP localhost port]:[Docker host port] [docker_repository_name]:[docker_repository_tag]
 # List Docker containers:
 #   -> docker ps
 # Stop the Docker container:
