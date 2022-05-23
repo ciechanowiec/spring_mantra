@@ -299,6 +299,16 @@ cat > $pomFile << EOF
       <optional>true</optional>
     </dependency>
 
+    <!-- microservices -->
+    <dependency>
+      <!-- declares the app as a client that connects to a Spring
+           Cloud Config Server to fetch the application's configuration;
+           to set the application as Spring Cloud Config Server, replace
+           the dependency below by 'spring-cloud-config-server' -->
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-config</artifactId>
+    </dependency>
+
     <!-- data persistence -->
     <dependency>
       <!-- allows to persist data in SQL stores with Java
@@ -312,14 +322,6 @@ cat > $pomFile << EOF
            modes as well as a browser based console application -->
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-    </dependency>
-
-    <!-- microservices -->
-    <dependency>
-      <!-- declares the app as a client that connects to a Spring
-           Cloud Config Server to fetch the application's configuration -->
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-config</artifactId>
     </dependency>
 
     <!-- logging -->
@@ -340,7 +342,7 @@ cat > $pomFile << EOF
       <dependency>
         <!-- a Bill of Materials required by Spring Cloud; it is
              added by default by Spring Initializr when adding
-             spring-cloud-starter-config dependency; details:
+             Spring Cloud dependencies; details:
              https://spring.io/projects/spring-cloud-->
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-dependencies</artifactId>
@@ -353,7 +355,7 @@ cat > $pomFile << EOF
 
   <build>
     <plugins>
-      <!-- spring -->
+      <!-- Spring -->
       <plugin>
         <!-- allows to package executable jar or war archives, run Spring
              Boot applications, generate build information and start Spring
