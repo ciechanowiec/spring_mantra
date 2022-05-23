@@ -304,10 +304,31 @@ cat > $pomFile << EOF
       <!-- declares the app as a client that connects to a Spring
            Cloud Config Server to fetch the application's configuration;
            to set the application as Spring Cloud Config Server, replace
-           the dependency below by 'spring-cloud-config-server' -->
+           the dependency below with 'spring-cloud-config-server' -->
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-config</artifactId>
     </dependency>
+<!-- the code below is intentionally commented out;
+     restore it from the comment or remove for the
+     production release -->
+<!--    <dependency>-->
+<!--      &lt;!&ndash; declares the app as a Eureka Client; to set the application-->
+<!--           as Eureka Server, replace the dependency below-->
+<!--           with 'spring-cloud-starter-netflix-eureka-server' &ndash;&gt;-->
+<!--      <groupId>org.springframework.cloud</groupId>-->
+<!--      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      &lt;!&ndash; allows for client-side load-balancing &ndash;&gt;-->
+<!--      <groupId>org.springframework.cloud</groupId>-->
+<!--      <artifactId>spring-cloud-starter-loadbalancer</artifactId>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      &lt;!&ndash; dynamically generates a proxy class to-->
+<!--           invoke the targeted REST service &ndash;&gt;-->
+<!--      <groupId>org.springframework.cloud</groupId>-->
+<!--      <artifactId>spring-cloud-starter-openfeign</artifactId>-->
+<!--    </dependency>-->
 
     <!-- data persistence -->
     <dependency>
