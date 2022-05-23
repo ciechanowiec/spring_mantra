@@ -251,7 +251,7 @@ cat > $pomFile << EOF
     <!-- ATTENTION: the version of spring-cloud-dependencies should correspond to the
                     appropriate version of Spring Boot application; see details at:
                     https://spring.io/projects/spring-cloud -->
-    <spring-cloud.version>2021.0.3-SNAPSHOT</spring-cloud.version>
+    <spring-cloud.version>2021.0.2</spring-cloud.version>
     <!-- plugins -->
     <dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
     <docker.image.prefix>$secondLevelPackageName</docker.image.prefix>
