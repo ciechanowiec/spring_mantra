@@ -47,7 +47,7 @@ The script is executed according to the following algorithm:
 /home/herman/colibriproject
 ├── Dockerfile
 ├── pom.xml
-├── README.md
+├── README.adoc
 └── src
     ├── main
     │   ├── java
